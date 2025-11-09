@@ -8,8 +8,8 @@ nav {
   display: flex;
   flex-direction: column;
   gap: 10px;
-  background-color: #f4f4f4;
-  padding: 20px;
+ 
+  
   height: 100vh;
 }
 
