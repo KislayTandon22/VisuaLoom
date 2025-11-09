@@ -1,16 +1,15 @@
-from fastapi import FastAPI, Query
-from fastapi.middleware.cors import CORSMiddleware
-#start of the app
-app= FastAPI()
+import uvicorn
+import logging
+from api import app
 
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],  # frontend (React) can access it easily
-    allow_methods=["*"],
-    allow_headers=["*"],
+# -------------------------------
+# Configure logging
+# -------------------------------
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s"
 )
 
-@app.get("/")
-def health_check():
-    return {"status": "API is running"}
+if __name__ == "__main__":
+    logging.info("🚀 Starting AI Image Search backend...")
+    uvicorn.run(app, host="0.0.0.0", port=8000)

@@ -100,4 +100,3 @@ def index_images(base_dir: str) -> List[Dict[str, Any]]:
 if __name__ == "__main__":
     base = os.path.expanduser("~")  # your home directory for testing
     index_images(base)
-i

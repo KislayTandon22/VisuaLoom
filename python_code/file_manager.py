@@ -6,7 +6,7 @@ Handles reading/writing images and metadata files.
 
 import os
 import json
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from PIL import Image
 from config import IMAGE_DB_PATH, IMAGE_DIR, THUMBNAIL_DIR
 
@@ -14,12 +14,25 @@ from config import IMAGE_DB_PATH, IMAGE_DIR, THUMBNAIL_DIR
 # JSON Database Helpers
 # -----------------------------
 
-def load_json() -> List[Dict[str, Any]]:
-    """Load the image metadata database."""
-    if os.path.exists(IMAGE_DB_PATH):
-        with open(IMAGE_DB_PATH, "r") as f:
+def load_json(path: Optional[str] = None) -> List[Dict[str, Any]]:
+    """
+    Load JSON data from disk.
+    - If no path provided, defaults to IMAGE_DB_PATH.
+    - Returns [] if file does not exist or is invalid.
+    """
+    path = path or IMAGE_DB_PATH
+    if not os.path.exists(path):
+        return []
+    try:
+        with open(path, "r", encoding="utf-8") as f:
             return json.load(f)
-    return []
+    except json.JSONDecodeError:
+        print(f"⚠️ Corrupted JSON file detected: {path}. Resetting to empty list.")
+        return []
+    except Exception as e:
+        print(f"❌ Error loading JSON {path}: {e}")
+        return []
+
 
 def save_json(data: List[Dict[str, Any]]):
     """Save the image metadata database."""
