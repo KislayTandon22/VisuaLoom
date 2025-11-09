@@ -1,10 +1,22 @@
-/python-code/venv
-/visualoom/.vite
-/python-code/__pycache__/
-/python-code/*.pyc
-/visualoom/node_modules/
-/visualoom/dist/
-/visualoom/.env
-/python-code/tests/__pycache__/
-/python-code/tests/*.pyc
-/python-code/.env
+python_code/venv/
+python_code/__pycache__/
+python_code/.pytest_cache/
+python_code/tests/__pycache__/
+python_code/tests/.pytest_cache/
+python_code/*.pyc
+python_code/.coverage
+python_code/.env
+
+# Visualoom
+visualoom/node_modules/
+visualoom/dist/
+visualoom/.vite/
+visualoom/.env
+visualoom/.coverage
+
+# General patterns
+*.pyc
+__pycache__/
+.pytest_cache/
+.env
+.coverage
