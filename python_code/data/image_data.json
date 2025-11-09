@@ -1,0 +1,22 @@
+[
+    {
+        "id": "test_image.jpg",
+        "path": "/private/var/folders/sj/rp59t7cn30l9h225q6nxg1g40000gn/T/pytest-of-kislayranjanneetandon/pytest-8/test_image_indexing0/test_image.jpg",
+        "format": "JPEG",
+        "width": 100,
+        "height": 100,
+        "size_bytes": 825,
+        "created": "2025-11-09T11:45:10.374304",
+        "modified": "2025-11-09T11:45:10.374304"
+    },
+    {
+        "id": "test_image.jpg",
+        "path": "/private/var/folders/sj/rp59t7cn30l9h225q6nxg1g40000gn/T/pytest-of-kislayranjanneetandon/pytest-9/test_image_indexing0/test_image.jpg",
+        "format": "JPEG",
+        "width": 100,
+        "height": 100,
+        "size_bytes": 825,
+        "created": "2025-11-09T11:45:29.503694",
+        "modified": "2025-11-09T11:45:29.503694"
+    }
+]
