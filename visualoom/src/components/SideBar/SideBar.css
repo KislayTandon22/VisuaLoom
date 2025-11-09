@@ -1,0 +1,14 @@
+.main-navigation-items{
+    color: rgb(34, 182, 195);
+    font-size: 14px;
+
+}
+.main-navigation-items:hover{
+    color: rgb(34, 182, 195);
+    font-size: 14px;
+    
+}
+.navigation-heading{
+    color: rgba(43, 48, 59, 0.7);
+    font-size: 12px;
+}

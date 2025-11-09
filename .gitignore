@@ -1,0 +1,10 @@
+/python-code/venv
+/visualoom/.vite
+/python-code/__pycache__/
+/python-code/*.pyc
+/visualoom/node_modules/
+/visualoom/dist/
+/visualoom/.env
+/python-code/tests/__pycache__/
+/python-code/tests/*.pyc
+/python-code/.env

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import './App.css'
-import { SideBar } from './components/SideBar'
+import { SideBar } from './components/SideBar/SideBar'
 import { Routes, Route } from "react-router-dom"
 
 function App() {
@@ -15,9 +15,9 @@ function App() {
       <div className="main-content">
         <Routes>
           <Route path="/" element={<h2>Home Page</h2>} />
-          <Route path="/Dashboard" element={<h2>About Page</h2>} />
-          <Route path="/AllIma" element={<h2>Page 1</h2>} />
-          <Route path="/page" element={<h2>Page 2</h2>} />
+          <Route path="/dashboard" element={<h2>About Page</h2>} />
+          <Route path="/gallery" element={<h2>All images</h2>} />
+          <Route path="/favorites" element={<h2>favorites</h2>} />
         </Routes>
       </div>
     </div>

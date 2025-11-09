@@ -1,0 +1,19 @@
+# --- Base Dependencies ---
+fastapi==0.115.2
+uvicorn==0.32.0
+opencv-python==4.10.0.84
+Pillow==10.4.0
+torch==2.4.1
+torchvision==0.19.1
+sentence-transformers==3.1.1
+psutil==6.0.0
+numpy==1.26.4
+scikit-learn==1.5.2
+tinydb==4.8.0
+
+# --- LLM Integration ---
+transformers==4.46.1
+accelerate==1.1.1
+datasets==3.0.1
+peft==0.13.2     # for parameter-efficient fine-tuning
+bitsandbytes==0.42.0  # for low-memory training (optional) - updated to latest available version
