@@ -6,6 +6,7 @@ python_code/tests/.pytest_cache/
 python_code/*.pyc
 python_code/.coverage
 python_code/.env
+/node_modules
 
 # Visualoom
 visualoom/node_modules/
