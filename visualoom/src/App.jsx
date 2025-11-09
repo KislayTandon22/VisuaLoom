@@ -6,15 +6,18 @@ import Folder from './pages/Folder/Folder'
 import Search from './pages/Search/Search'
 import Tags from './pages/Tags/Tags'
 import Settings from './pages/Settings/Settings'
+import { HeaderBar } from './components/HeadBar/HeadBar'
 
 function App() {
   return (
     <div className="app-container">
       {/* Sidebar stays on the left */}
       <SideBar />
+      
 
       {/* Main content area */}
       <div className="main-content">
+        <HeaderBar />
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/folder" element={<Folder />} />

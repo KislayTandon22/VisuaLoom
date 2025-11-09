@@ -1,25 +1,35 @@
-.main-navigation-items{
-    color: rgb(34, 182, 195);
-    font-size: 14px;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 0.5rem;
-    font-weight: 500;
-
-
+/* Sidebar Container */
+.sidebar {
+  @apply bg-neutral-900 text-white h-screen w-64 flex flex-col p-5 space-y-6 shadow-lg;
 }
 
-.main-navigation-items:hover{
-    color: rgb(34, 182, 195);
-    font-size: 14px;
-    
-    
-    
-    
-    
+/* Section heading */
+.navigation-heading {
+  color: #94a3b8; /* soft slate */
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-bottom: 0.25rem;
 }
-.navigation-heading{
-    
-    font-size: 12px;
+
+/* Navigation links */
+.main-navigation-items {
+  @apply flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200;
+  color: #cbd5e1;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+/* Hover + Active states */
+.main-navigation-items:hover {
+  color: rgb(34, 182, 195);
+  background-color: rgba(34, 182, 195, 0.1);
+}
+
+.main-navigation-items.active {
+  color: white;
+  background-color: rgb(34, 182, 195);
+  font-weight: 600;
 }
