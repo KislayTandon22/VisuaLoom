@@ -1,14 +1,12 @@
 import React from "react";
-import "./Home.css";
-import { HeaderBar } from "../../components/HeadBar/HeadBar";
+import { FolderList } from "../../components/FolderList/FolderList";
 
-export default function Home() {
+export const Home = () => {
   return (
-    <div className="page-container">
-      sdsdfa dasfasdfasd
-      <div>
-        <div></div>
-      </div>
+    <div className="p-8">
+      <FolderList apiBaseUrl="http://127.0.0.1:8000" />
     </div>
   );
-}
+};
+
+export default Home;
