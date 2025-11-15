@@ -1,6 +1,12 @@
 import { Link, useLocation } from "react-router-dom";
 import "./SideBar.css";
-import { IoHomeOutline, IoFolderOpen, IoSearch, IoPricetagOutline, IoSettingsOutline } from "react-icons/io5";
+import {
+  IoHomeOutline,
+  IoFolderOpen,
+  IoSearch,
+  IoPricetagOutline,
+  IoSettingsOutline,
+} from "react-icons/io5";
 
 export const SideBar = () => {
   const location = useLocation();
@@ -8,6 +14,7 @@ export const SideBar = () => {
   const navItems = [
     { path: "/", label: "Home", icon: <IoHomeOutline /> },
     { path: "/folder", label: "Folder", icon: <IoFolderOpen /> },
+    { path: "/indexed", label: "Indexed", icon: <IoPricetagOutline /> },
     { path: "/search", label: "Search", icon: <IoSearch /> },
     { path: "/tags", label: "Tags", icon: <IoPricetagOutline /> },
     { path: "/settings", label: "Settings", icon: <IoSettingsOutline /> },

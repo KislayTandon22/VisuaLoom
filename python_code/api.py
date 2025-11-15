@@ -28,6 +28,8 @@ from files_list import (
     count_total_images_recursive,
     IMAGE_EXTENSIONS
 )
+from image_indexer import extract_metadata, is_image_file
+from file_manager import load_json, save_json
 
 # ======================================================
 # 🧠 CLIP Model Wrapper
@@ -301,6 +303,42 @@ async def get_index_status(job_id: str):
     if not job:
         raise HTTPException(status_code=404, detail="Job not found")
     return job
+
+
+@app.post("/index/files")
+async def index_files(files: List[str]):
+    """Index a list of image file paths passed from the frontend.
+
+    This endpoint will append metadata for any new image files into the
+    JSON DB and return the list of indexed items.
+    """
+    try:
+        files_to_index = [os.path.expanduser(p) for p in files]
+        all_data = load_json()
+        newly_indexed = []
+
+        for fp in files_to_index:
+            if not os.path.isfile(fp):
+                continue
+            # ensure it's an image we support
+            if not is_image_file(fp):
+                continue
+
+            # skip if already indexed
+            if any(img.get("path") == fp for img in all_data):
+                continue
+
+            meta = extract_metadata(fp)
+            if meta:
+                all_data.append(meta)
+                newly_indexed.append(meta)
+
+        if newly_indexed:
+            save_json(all_data)
+
+        return {"indexed": len(newly_indexed), "items": newly_indexed}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @app.delete("/delete/{image_id}")

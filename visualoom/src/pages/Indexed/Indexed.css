@@ -1,0 +1,20 @@
+.results-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 12px;
+}
+.result-item {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 8px;
+  border: 1px solid #eef2f7;
+  border-radius: 8px;
+  background: #fff;
+}
+.result-meta .result-title {
+  font-weight: 600;
+}
+.result-meta .text-xs {
+  font-size: 12px;
+}

@@ -1,4 +1,6 @@
-
+/* ------------------------------------ */
+/* ORIGINAL STRUCTURE (UNCHANGED)       */
+/* ------------------------------------ */
 
 .app-container {
   display: flex;
@@ -8,12 +10,91 @@ nav {
   display: flex;
   flex-direction: column;
   gap: 10px;
- 
-  
-  height: 100vh;
+
+  /* FIX: prevents search bar from moving down */
+  min-height: 100vh;
+  height: auto;
+
+  /* SIDEBAR DARK THEME */
+  background-color: #181818;
+
+  padding: 16px;
 }
 
 .main-content {
   flex-grow: 1;
   padding: 20px;
+  background-color: #1e1e1e;
+  color: #ffffff;
+
+  /* FIX: keeps main content aligned horizontally */
+  display: flex;
+  flex-direction: column;
+}
+
+/* ------------------------------------ */
+/* DARK THEME ADDITIONS                  */
+/* ------------------------------------ */
+
+body {
+  background-color: #1e1e1e;
+  color: #ffffff;
+  margin: 0;
+  font-family: sans-serif;
+}
+
+/* Sidebar links */
+nav a,
+nav button {
+  color: #cfcfcf;
+  text-decoration: none;
+  padding: 8px;
+  border-radius: 6px;
+}
+
+nav a:hover,
+nav button:hover {
+  background-color: #2a2a2a;
+  color: #ffffff;
+}
+
+/* Header bar */
+.header-bar {
+  background-color: #181818;
+  border-bottom: 1px solid #333;
+  padding: 12px 20px;
+  color: #fff;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/* Search bars */
+input,
+textarea,
+select {
+  background: #2a2a2a;
+  color: #ffffff;
+  border: 1px solid #444;
+  padding: 10px;
+  border-radius: 8px;
+}
+
+input::placeholder {
+  color: #999999;
+}
+
+/* Buttons */
+button {
+  background-color: #2a2a2a;
+  border: 1px solid #444;
+  color: #ffffff;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #333333;
 }

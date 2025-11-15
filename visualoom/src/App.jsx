@@ -1,19 +1,19 @@
-import './App.css'
-import { SideBar } from './components/SideBar/SideBar'
-import { Routes, Route } from "react-router-dom"
-import Home from './pages/Home/Home'
-import Folder from './pages/Folder/Folder'
-import Search from './pages/Search/Search'
-import Tags from './pages/Tags/Tags'
-import Settings from './pages/Settings/Settings'
-import { HeaderBar } from './components/HeadBar/HeadBar'
+import "./App.css";
+import { SideBar } from "./components/SideBar/SideBar";
+import { Routes, Route } from "react-router-dom";
+import Home from "./pages/Home/Home";
+import Folder from "./pages/Folder/Folder";
+import Search from "./pages/Search/Search";
+import Tags from "./pages/Tags/Tags";
+import Settings from "./pages/Settings/Settings";
+import Indexed from "./pages/Indexed/Indexed";
+import { HeaderBar } from "./components/HeadBar/HeadBar";
 
 function App() {
   return (
     <div className="app-container">
       {/* Sidebar stays on the left */}
       <SideBar />
-      
 
       {/* Main content area */}
       <div className="main-content">
@@ -21,13 +21,14 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/folder" element={<Folder />} />
+          <Route path="/indexed" element={<Indexed />} />
           <Route path="/search" element={<Search />} />
           <Route path="/tags" element={<Tags />} />
           <Route path="/settings" element={<Settings />} />
         </Routes>
       </div>
     </div>
-  )
+  );
 }
 
-export default App
+export default App;

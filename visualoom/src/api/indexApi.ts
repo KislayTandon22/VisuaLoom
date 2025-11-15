@@ -41,6 +41,32 @@ export const startIndexing = async (folderPath: string) => {
   return response.data;
 };
 
+/** Index specific files (array of absolute paths) */
+export const indexFiles = async (paths: string[]) => {
+  const response = await axios.post(`${BASE_URL}/index/files`, {
+    files: paths,
+  });
+  return response.data;
+};
+
+/** Search indexed images using backend search engine */
+export const searchImages = async (query: string) => {
+  const response = await axios.get(`${BASE_URL}/search/`, {
+    params: { query },
+  });
+  return response.data;
+};
+
+/** Upload a single image file to be indexed */
+export const uploadImage = async (file: File) => {
+  const form = new FormData();
+  form.append("file", file);
+  const response = await axios.post(`${BASE_URL}/upload/`, form, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+  return response.data;
+};
+
 /** ✅ Delete image */
 export const deleteImageById = async (id: string) => {
   const res = await axios.delete(`${BASE_URL}/delete/${id}`);
