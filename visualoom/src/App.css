@@ -16,7 +16,7 @@ nav {
   height: auto;
 
   /* SIDEBAR DARK THEME */
-  background-color: #181818;
+  background-color: var(--bg-secondary);
 
   padding: 16px;
 }
@@ -24,20 +24,12 @@ nav {
 .main-content {
   flex-grow: 1;
   padding: 20px;
-  background-color: #1e1e1e;
-  color: #ffffff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
 
   /* FIX: keeps main content aligned horizontally */
   display: flex;
   flex-direction: column;
-}
-
-/* Light Mode Override */
-@media (prefers-color-scheme: light) {
-  .main-content {
-    background-color: #dcdbdb;
-    color: #0f172a; /* slate-900 */
-  }
 }
 
 /* ------------------------------------ */
@@ -45,8 +37,8 @@ nav {
 /* ------------------------------------ */
 
 body {
-  background-color: #1e1e1e;
-  color: #ffffff;
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
   margin: 0;
   font-family: sans-serif;
 }
@@ -54,7 +46,7 @@ body {
 /* Sidebar links */
 nav a,
 nav button {
-  color: #cfcfcf;
+  color: var(--text-secondary);
   text-decoration: none;
   padding: 8px;
   border-radius: 6px;
@@ -62,16 +54,16 @@ nav button {
 
 nav a:hover,
 nav button:hover {
-  background-color: #2a2a2a;
-  color: #ffffff;
+  background-color: var(--bg-hover);
+  color: var(--text-primary);
 }
 
 /* Header bar */
 .header-bar {
-  background-color: #181818;
-  border-bottom: 1px solid #333;
+  background-color: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
   padding: 12px 20px;
-  color: #fff;
+  color: var(--text-primary);
 
   display: flex;
   justify-content: space-between;
@@ -82,27 +74,27 @@ nav button:hover {
 input,
 textarea,
 select {
-  background: #2a2a2a;
-  color: #ffffff;
-  border: 1px solid #444;
+  background: var(--input-bg);
+  color: var(--input-text);
+  border: 1px solid var(--input-border);
   padding: 10px;
   border-radius: 8px;
 }
 
 input::placeholder {
-  color: #999999;
+  color: var(--text-tertiary);
 }
 
 /* Buttons */
 button {
-  background-color: #2a2a2a;
-  border: 1px solid #444;
-  color: #ffffff;
+  background-color: var(--button-bg-secondary);
+  border: 1px solid var(--button-border);
+  color: var(--text-primary);
   padding: 10px 16px;
   border-radius: 8px;
   cursor: pointer;
 }
 
 button:hover {
-  background-color: #333333;
+  background-color: var(--bg-hover);
 }

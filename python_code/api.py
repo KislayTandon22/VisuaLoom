@@ -20,15 +20,13 @@ from image_indexer import index_images, extract_metadata, is_image_file
 from search_engine import SearchEngine
 from config import IMAGE_DIR
 from database import get_all_folders as get_folders_from_db
-from files_list import (
-    get_root_folders,
-    list_folder_contents,
-    search_folders_with_images,
-    validate_path,
-    get_folder_stats,
-    get_folder_thumbnail_images,
-    count_total_images_recursive,
-    IMAGE_EXTENSIONS
+from file_explorer import (
+    roots_impl,
+    browse_impl,
+    search_impl,
+    validate_impl,
+    thumbnails_impl,
+    count_images_impl,
 )
 from file_manager import load_json, save_json
 
@@ -113,6 +111,40 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# ======================================================
+# Folders Endpoints (Alias for frontend compatibility)
+# ======================================================
+
+@app.get("/folders/roots")
+def folders_roots():
+    """Get top-level directories."""
+    return roots_impl()
+
+@app.get("/folders/browse")
+def folders_browse(path: str = Query(...), include_files: bool = False, page: int = 1, per_page: int = 50):
+    """Browse folder contents."""
+    return browse_impl(path=path, include_files=include_files, page=page, per_page=per_page)
+
+@app.get("/folders/search")
+def folders_search(base_path: str = Query(...), query: str = "", max_results: int = 100):
+    """Search for folders containing images."""
+    return search_impl(base_path=base_path, query=query, max_results=max_results)
+
+@app.post("/folders/validate")
+def folders_validate(path: str = Form(...)):
+    """Validate a path."""
+    return validate_impl(path=path)
+
+@app.get("/folders/thumbnails")
+def folders_thumbnails(path: str = Query(...), limit: int = 6):
+    """Get thumbnail images from a folder."""
+    return thumbnails_impl(path=path, limit=limit)
+
+@app.get("/folders/count")
+def folders_count_images(path: str = Query(...)):
+    """Count total images in a folder."""
+    return count_images_impl(path=path)
 
 
 # ======================================================
@@ -201,134 +233,7 @@ async def health():
     return {"status": "ok"}
 
 
-# ======================================================
-# File Browsing Endpoints (from api.py)
-# ======================================================
 
-@app.get("/roots")
-def get_roots():
-    """Return top-level directories the user can browse."""
-    roots = []
-    for r in ALLOWED_ROOTS:
-        if os.path.exists(r):
-            roots.append({
-                "name": os.path.basename(os.path.abspath(r)) or r,
-                "path": os.path.abspath(r)
-            })
-    return {"folders": roots}
-
-
-@app.get("/browse")
-def browse(path: str = Query(...), include_files: bool = True):
-    """Browse inside a directory."""
-    return list_directory(path, include_files)
-
-
-# ======================================================
-# Folder Navigation Endpoints (from main.py)
-# ======================================================
-
-@app.get("/folders/roots")
-async def get_root_folders_endpoint():
-    """Get root/system folders to start browsing."""
-    try:
-        roots = get_root_folders()
-        return {
-            "folders": roots,
-            "system": platform.system()
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/folders/browse")
-async def browse_folder(
-    path: str,
-    include_files: bool = False,
-    page: int = 1,
-    per_page: int = 50
-):
-    """Browse contents of a specific folder with pagination."""
-    try:
-        path = os.path.expanduser(path)
-        items = list_folder_contents(path, include_files)
-        
-        # Pagination
-        start = (page - 1) * per_page
-        end = start + per_page
-        paginated_items = items[start:end]
-        
-        return {
-            "path": path,
-            "items": paginated_items,
-            "total": len(items),
-            "page": page,
-            "per_page": per_page,
-            "has_more": end < len(items)
-        }
-    except HTTPException:
-        raise
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/folders/search")
-async def search_folders_endpoint(
-    base_path: str,
-    query: str = "",
-    max_results: int = 100
-):
-    """Search for folders containing images within a base path."""
-    try:
-        base_path = os.path.expanduser(base_path)
-        results = search_folders_with_images(base_path, query, max_results)
-        
-        return {
-            "base_path": base_path,
-            "query": query,
-            "results": results,
-            "count": len(results)
-        }
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.get("/folders")
-@app.get("/folders/")
-async def get_indexed_folders():
-    """Return all previously indexed folders from database."""
-    try:
-        folders = get_folders_from_db() if callable(get_folders_from_db) else []
-        return {"folders": folders}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
-
-
-@app.post("/folders/validate")
-async def validate_folder_access(path: str = Form(...)):
-    """Check if a folder path is valid and accessible."""
-    try:
-        path = os.path.expanduser(path)
-        
-        if not os.path.exists(path):
-            return {"valid": False, "error": "Path does not exist"}
-        
-        if not os.path.isdir(path):
-            return {"valid": False, "error": "Path is not a directory"}
-        
-        try:
-            stats = get_folder_stats(Path(path))
-            return {
-                "valid": True,
-                "path": path,
-                "readable": not stats.get("permission_denied", False),
-                **stats
-            }
-        except PermissionError:
-            return {"valid": True, "path": path, "readable": False, "error": "Permission denied"}
-            
-    except Exception as e:
-        return {"valid": False, "error": str(e)}
 
 
 # ======================================================

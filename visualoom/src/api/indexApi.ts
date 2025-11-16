@@ -84,3 +84,27 @@ export const deleteImageById = async (id: string) => {
   const res = await axios.delete(`${BASE_URL}/delete/${id}`);
   return res.data;
 };
+
+/** Get thumbnail images from a folder */
+export const getFolderThumbnails = async (path: string, limit: number = 6) => {
+  const response = await axios.get(`${BASE_URL}/folders/thumbnails`, {
+    params: { path, limit },
+  });
+  return response.data;
+};
+
+/** Count total images in a folder (recursive) */
+export const countFolderImages = async (path: string) => {
+  const response = await axios.get(`${BASE_URL}/folders/count`, {
+    params: { path },
+  });
+  return response.data;
+};
+
+/** Validate if a path is accessible */
+export const validatePath = async (path: string) => {
+  const form = new FormData();
+  form.append("path", path);
+  const response = await axios.post(`${BASE_URL}/folders/validate`, form);
+  return response.data;
+};

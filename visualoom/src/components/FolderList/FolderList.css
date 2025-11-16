@@ -12,7 +12,7 @@
   width: 10px;
 }
 .folder-list-scroll::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.08);
+  background: var(--border-color);
   border-radius: 8px;
 }
 .folder-list-scroll::-webkit-scrollbar-track {
@@ -61,6 +61,7 @@
   padding: 0;
   text-align: left;
   cursor: pointer;
+  color: var(--text-primary);
 }
 .folder-select-btn:focus {
   outline: none;
@@ -86,30 +87,36 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 6px 18px rgba(15, 23, 42, 0.04);
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
 }
 
 .indexed-tile {
   padding: 12px;
-  background: #f8fafc;
+  background: var(--bg-secondary);
   border-radius: 8px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  color: var(--text-primary);
 }
 
 .indexed-tile:hover {
   transform: translateY(-2px);
   transition: transform 120ms ease;
+  background-color: var(--bg-hover);
 }
 
 .items-grid .item-tile {
-  background: #ffffff;
-  border: 1px solid #eef2f7;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
 }
 
 .item-tile:hover {
   box-shadow: 0 8px 20px rgba(2, 6, 23, 0.06);
   transform: translateY(-3px);
+  border-color: var(--accent-primary);
 }
 
 .thumb {
@@ -134,9 +141,11 @@
 
 .available-column .MuiCardHeader-root {
   padding: 18px 20px;
+  color: var(--text-primary);
 }
 .indexed-column .MuiCardHeader-root {
   padding: 18px 20px;
+  color: var(--text-primary);
 }
 
 .available-column .MuiCardContent-root,

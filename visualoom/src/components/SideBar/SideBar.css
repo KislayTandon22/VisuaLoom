@@ -1,11 +1,13 @@
 /* Sidebar Container */
 .sidebar {
-  @apply bg-neutral-900 text-white h-screen w-64 flex flex-col p-5 space-y-6 shadow-lg;
+  @apply h-screen w-64 flex flex-col p-5 space-y-6 shadow-lg;
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
 }
 
 /* Section heading */
 .navigation-heading {
-  color: #94a3b8; /* soft slate */
+  color: var(--text-tertiary);
   font-size: 12px;
   font-weight: 600;
   text-transform: uppercase;
@@ -16,7 +18,7 @@
 /* Navigation links */
 .main-navigation-items {
   @apply flex items-center gap-3 px-3 py-2 rounded-xl transition-all duration-200;
-  color: #cbd5e1;
+  color: var(--text-secondary);
   font-size: 14px;
   font-weight: 500;
   text-decoration: none;
@@ -24,12 +26,12 @@
 
 /* Hover + Active states */
 .main-navigation-items:hover {
-  color: rgb(34, 182, 195);
-  background-color: rgba(34, 182, 195, 0.1);
+  color: var(--accent-primary);
+  background-color: rgba(0, 102, 204, 0.1);
 }
 
 .main-navigation-items.active {
   color: white;
-  background-color: rgb(34, 182, 195);
+  background-color: var(--accent-primary);
   font-weight: 600;
 }

@@ -16,11 +16,11 @@
 
 .title {
   font-weight: 700;
-  color: #0f172a; /* slate-900 */
+  color: var(--text-primary);
 }
 
 .subtitle {
-  color: #475569; /* slate-600 */
+  color: var(--text-muted);
   margin-bottom: 32px;
 }
 
@@ -30,6 +30,8 @@
   box-shadow: 0 8px 28px rgba(0, 0, 0, 0.06);
   padding: 8px;
   margin-bottom: 32px;
+  background-color: var(--bg-card);
+  border: 1px solid var(--border-color);
 }
 
 .search-row {
@@ -48,6 +50,7 @@
   flex-direction: column;
   align-items: center;
   margin-top: 32px;
+  color: var(--text-muted);
 }
 
 .img-card img {
