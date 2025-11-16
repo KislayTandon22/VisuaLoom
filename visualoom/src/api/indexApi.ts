@@ -32,6 +32,18 @@ export const browseFolder = async (path: string, includeFiles = true) => {
   return response.data;
 };
 
+/** Search folders (server-side) for folders containing images or matching a query */
+export const searchFolders = async (
+  basePath: string,
+  query = "",
+  maxResults = 100,
+) => {
+  const response = await axios.get(`${BASE_URL}/folders/search`, {
+    params: { base_path: basePath, query, max_results: maxResults },
+  });
+  return response.data;
+};
+
 /** ✅ Begin indexing */
 export const startIndexing = async (folderPath: string) => {
   const form = new FormData();

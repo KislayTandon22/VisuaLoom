@@ -32,6 +32,14 @@ nav {
   flex-direction: column;
 }
 
+/* Light Mode Override */
+@media (prefers-color-scheme: light) {
+  .main-content {
+    background-color: #dcdbdb;
+    color: #0f172a; /* slate-900 */
+  }
+}
+
 /* ------------------------------------ */
 /* DARK THEME ADDITIONS                  */
 /* ------------------------------------ */

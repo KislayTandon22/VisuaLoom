@@ -1,23 +1,25 @@
-from fastapi import FastAPI, UploadFile, File, Form, HTTPException, BackgroundTasks, Request
-from fastapi.responses import JSONResponse
-from fastapi.middleware.cors import CORSMiddleware
-import torch
-import open_clip
-import numpy as np
-from PIL import Image
 import os
 import platform
 from pathlib import Path
 from typing import List, Optional
 from uuid import uuid4
-import mimetypes
 
+import torch
+import open_clip
+import numpy as np
+from PIL import Image
+
+from fastapi import FastAPI, HTTPException, Query, UploadFile, File, Form, BackgroundTasks, Request
+from fastapi.responses import JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+# Import your existing modules
 from image_manager import add_image, delete_image
-from image_indexer import index_images
+from image_indexer import index_images, extract_metadata, is_image_file
 from search_engine import SearchEngine
 from config import IMAGE_DIR
 from database import get_all_folders as get_folders_from_db
-
 from files_list import (
     get_root_folders,
     list_folder_contents,
@@ -28,8 +30,8 @@ from files_list import (
     count_total_images_recursive,
     IMAGE_EXTENSIONS
 )
-from image_indexer import extract_metadata, is_image_file
 from file_manager import load_json, save_json
+
 
 # ======================================================
 # 🧠 CLIP Model Wrapper
@@ -64,28 +66,45 @@ class CLIPEmbedModel:
             return np.zeros(512).tolist()
 
 
+# Initialize CLIP model and search engine
 embed_model = CLIPEmbedModel()
 search_engine = SearchEngine(embed_model)
 
 # ======================================================
-# 🚀 FastAPI Initialization
+# 🚀 FastAPI Application
 # ======================================================
 
 app = FastAPI(title="VisuaLoom API", version="1.0")
 
+# Store background indexing jobs
+index_jobs = {}
+
+# ---------------------------------------------------------
+# Allowed root directories (configurable)
+# ---------------------------------------------------------
+ALLOWED_ROOTS = [
+    "/",               # Linux / macOS root
+    "/mnt/data",       # Docker or cloud environments
+    "C:/",             # Windows root
+]
+
+
+# ======================================================
+# Startup & Middleware
+# ======================================================
 
 @app.on_event("startup")
 async def on_startup():
-    print("🚀 VisuaLoom API startup event — routes should be registered")
+    print("🚀 VisuaLoom API startup — all routes registered")
 
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    # Simple request/response logger to help debug 404s from the frontend
-    print(f"--> Incoming request: {request.method} {request.url}")
+    print(f"--> {request.method} {request.url}")
     response = await call_next(request)
-    print(f"<-- Completed {response.status_code} for {request.method} {request.url}")
+    print(f"<-- {response.status_code} for {request.method} {request.url}")
     return response
+
 
 app.add_middleware(
     CORSMiddleware,
@@ -96,41 +115,118 @@ app.add_middleware(
 )
 
 
+# ======================================================
+# Helper Functions
+# ======================================================
+
+def is_allowed(path: str) -> bool:
+    """Ensure the requested path is inside allowed roots."""
+    path = os.path.abspath(path)
+    for root in ALLOWED_ROOTS:
+        try:
+            root_abs = os.path.abspath(root)
+            if os.path.commonpath([path, root_abs]) == root_abs:
+                return True
+        except:
+            pass
+    return False
+
+
+def list_directory(path: str, include_files: bool = True):
+    """List folder contents safely and consistently."""
+    path = os.path.abspath(path)
+
+    if not is_allowed(path):
+        raise HTTPException(403, "Path not allowed.")
+
+    if not os.path.exists(path):
+        raise HTTPException(404, "Path does not exist.")
+
+    # If it's a file, return it directly
+    if os.path.isfile(path):
+        return {
+            "items": [{
+                "name": os.path.basename(path),
+                "path": path,
+                "type": "file"
+            }]
+        }
+
+    # Directory listing
+    items = []
+    try:
+        with os.scandir(path) as scan:
+            for entry in scan:
+                try:
+                    entry_type = "folder" if entry.is_dir() else "file"
+                except:
+                    continue
+
+                if entry_type == "file" and not include_files:
+                    continue
+
+                items.append({
+                    "name": entry.name,
+                    "path": entry.path,
+                    "type": entry_type
+                })
+    except PermissionError:
+        raise HTTPException(403, "Permission denied.")
+
+    # Sort: folders first, then alphabetically
+    items.sort(key=lambda x: (0 if x["type"] == "folder" else 1, x["name"].lower()))
+
+    return {"items": items}
+
+
+# ======================================================
+# Pydantic Models
+# ======================================================
+
+class IndexRequest(BaseModel):
+    paths: List[str]
+
+
+# ======================================================
+# Root & Health Endpoints
+# ======================================================
+
 @app.get("/")
 async def root():
-    return {"message": "🧠 VisuaLoom API is running with CLIP embeddings!"}
+    return {"message": "🧠 VisuaLoom API with CLIP embeddings!"}
 
 
 @app.get("/health")
 async def health():
-    """Simple health check endpoint to confirm server is running."""
     return {"status": "ok"}
 
 
-@app.post("/upload/")
-async def upload_image(file: UploadFile = File(...)):
-    try:
-        filename = file.filename
-        metadata = add_image(file, filename, embed_model)
-        return {"status": "success", "metadata": metadata}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+# ======================================================
+# File Browsing Endpoints (from api.py)
+# ======================================================
+
+@app.get("/roots")
+def get_roots():
+    """Return top-level directories the user can browse."""
+    roots = []
+    for r in ALLOWED_ROOTS:
+        if os.path.exists(r):
+            roots.append({
+                "name": os.path.basename(os.path.abspath(r)) or r,
+                "path": os.path.abspath(r)
+            })
+    return {"folders": roots}
 
 
-@app.get("/search/")
-async def search_images(query: str):
-    try:
-        results = search_engine.search(query)
-        return {"query": query, "results": results}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+@app.get("/browse")
+def browse(path: str = Query(...), include_files: bool = True):
+    """Browse inside a directory."""
+    return list_directory(path, include_files)
 
 
 # ======================================================
-# 🗂 Folder Navigation Endpoints
+# Folder Navigation Endpoints (from main.py)
 # ======================================================
-
-index_jobs = {}
 
 @app.get("/folders/roots")
 async def get_root_folders_endpoint():
@@ -152,10 +248,7 @@ async def browse_folder(
     page: int = 1,
     per_page: int = 50
 ):
-    """
-    Browse contents of a specific folder.
-    Returns subfolders and optionally image files.
-    """
+    """Browse contents of a specific folder with pagination."""
     try:
         path = os.path.expanduser(path)
         items = list_folder_contents(path, include_files)
@@ -185,10 +278,7 @@ async def search_folders_endpoint(
     query: str = "",
     max_results: int = 100
 ):
-    """
-    Search for folders containing images within a base path.
-    Optionally filter by folder name query.
-    """
+    """Search for folders containing images within a base path."""
     try:
         base_path = os.path.expanduser(base_path)
         results = search_folders_with_images(base_path, query, max_results)
@@ -240,6 +330,35 @@ async def validate_folder_access(path: str = Form(...)):
     except Exception as e:
         return {"valid": False, "error": str(e)}
 
+
+# ======================================================
+# Image Upload & Search Endpoints
+# ======================================================
+
+@app.post("/upload/")
+async def upload_image(file: UploadFile = File(...)):
+    """Upload and index a single image file."""
+    try:
+        filename = file.filename
+        metadata = add_image(file, filename, embed_model)
+        return {"status": "success", "metadata": metadata}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/search/")
+async def search_images(query: str):
+    """Search indexed images using CLIP embeddings."""
+    try:
+        results = search_engine.search(query)
+        return {"query": query, "results": results}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ======================================================
+# Indexing Endpoints (Combined)
+# ======================================================
 
 @app.post("/index/")
 async def index_folder(
@@ -306,29 +425,48 @@ async def get_index_status(job_id: str):
 
 
 @app.post("/index/files")
-async def index_files(files: List[str]):
-    """Index a list of image file paths passed from the frontend.
-
-    This endpoint will append metadata for any new image files into the
-    JSON DB and return the list of indexed items.
-    """
+@app.post("/index_files")
+async def index_files(req: IndexRequest = None, files: List[str] = None):
+    """Index a list of image file paths. Supports both request body formats."""
     try:
-        files_to_index = [os.path.expanduser(p) for p in files]
+        # Support both formats
+        if req:
+            files_to_index = [os.path.expanduser(p) for p in req.paths]
+        elif files:
+            files_to_index = [os.path.expanduser(p) for p in files]
+        else:
+            raise HTTPException(status_code=400, detail="No files provided")
+        
         all_data = load_json()
         newly_indexed = []
 
         for fp in files_to_index:
-            if not os.path.isfile(fp):
+            fp_abs = os.path.abspath(fp)
+            
+            # Security check
+            if not is_allowed(fp_abs):
+                raise HTTPException(403, f"Not allowed: {fp}")
+            
+            if not os.path.exists(fp_abs):
+                print(f"⚠️ File not found: {fp_abs}")
                 continue
-            # ensure it's an image we support
-            if not is_image_file(fp):
+                
+            if not os.path.isfile(fp_abs):
+                print(f"⚠️ Not a file: {fp_abs}")
+                continue
+            
+            # Ensure it's an image we support
+            if not is_image_file(fp_abs):
+                print(f"⚠️ Not an image file: {fp_abs}")
                 continue
 
-            # skip if already indexed
-            if any(img.get("path") == fp for img in all_data):
+            # Skip if already indexed
+            if any(img.get("path") == fp_abs for img in all_data):
+                print(f"✓ Already indexed: {fp_abs}")
                 continue
 
-            meta = extract_metadata(fp)
+            print(f"🔥 Indexing file: {fp_abs}")
+            meta = extract_metadata(fp_abs)
             if meta:
                 all_data.append(meta)
                 newly_indexed.append(meta)
@@ -336,15 +474,31 @@ async def index_files(files: List[str]):
         if newly_indexed:
             save_json(all_data)
 
-        return {"indexed": len(newly_indexed), "items": newly_indexed}
+        return {
+            "status": "ok",
+            "indexed_count": len(newly_indexed),
+            "indexed": newly_indexed
+        }
+    except HTTPException:
+        raise
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# ======================================================
+# Delete Endpoint
+# ======================================================
+
 @app.delete("/delete/{image_id}")
 async def delete_image_entry(image_id: str):
+    """Delete an indexed image entry."""
     try:
         delete_image(image_id)
         return {"status": "deleted", "id": image_id}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ======================================================
+# Run Server (Optional)
+# ======================================================

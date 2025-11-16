@@ -17,6 +17,7 @@ import {
   uploadImage,
   getIndexedFolders,
   browseFolder,
+  indexFiles,
 } from "../../api/indexApi";
 import "./Indexed.css";
 
@@ -192,7 +193,14 @@ export default function Indexed() {
                               </div>
                             ) : (
                               selectedFolderContents.items.map((it) => (
-                                <div key={it.path} className="result-item">
+                                <div
+                                  key={it.path}
+                                  className="result-item"
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
                                   <Avatar
                                     variant="rounded"
                                     sx={{
@@ -203,13 +211,37 @@ export default function Indexed() {
                                   >
                                     🖼
                                   </Avatar>
-                                  <div className="result-meta">
+                                  <div
+                                    className="result-meta"
+                                    style={{ marginLeft: 12 }}
+                                  >
                                     <div className="result-title">
                                       {it.name}
                                     </div>
                                     <div className="text-xs text-gray-500 truncate">
                                       {it.path}
                                     </div>
+                                  </div>
+                                  <div style={{ marginLeft: "auto" }}>
+                                    <Button
+                                      size="small"
+                                      variant="outlined"
+                                      onClick={async () => {
+                                        try {
+                                          const res = await indexFiles([
+                                            it.path,
+                                          ]);
+                                          alert(
+                                            `Indexed ${res.indexed_count || res.indexed || 0} file(s)`,
+                                          );
+                                        } catch (e) {
+                                          console.error(e);
+                                          alert("Index failed");
+                                        }
+                                      }}
+                                    >
+                                      Index
+                                    </Button>
                                   </div>
                                 </div>
                               ))
