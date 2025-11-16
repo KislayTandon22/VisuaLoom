@@ -26,6 +26,7 @@ nav {
   padding: 20px;
   background-color: var(--bg-primary);
   color: var(--text-primary);
+  height: 100vh;
 
   /* FIX: keeps main content aligned horizontally */
   display: flex;

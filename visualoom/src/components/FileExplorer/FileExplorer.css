@@ -1,7 +1,17 @@
 .file-explorer {
   padding: 20px;
-  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  box-sizing: border-box;
+  /* Hide scrollbar while keeping scrolling functionality */
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.file-explorer::-webkit-scrollbar {
+  display: none;
 }
 
 /* Header */
